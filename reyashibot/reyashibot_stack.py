@@ -20,13 +20,13 @@ class ReyashibotStack(Stack):
         )   
 
         tea_glossary_search = _lambda.Function(
-            self, "TeaGlossarySearch",
+            self, 'TeaGlossarySearch',
             runtime=_lambda.Runtime.PYTHON_3_8,
-            code=_lambda.Code.from_asset("./lambda/tea_glossary_search/handler"),
-            handler="tea_glossary_search.handler",
+            code=_lambda.Code.from_asset('./lambda/tea_glossary_search/handler'),
+            handler='tea_glossary_search.lambda_handler',
             layers=[lambdaSearchLayer],
             environment={
-                "discord_public_key": "discord_app_id",
+                'discord_public_key': 'discord_app_id',
             },
         )
         
@@ -37,30 +37,30 @@ class ReyashibotStack(Stack):
             proxy=False
         )
 
-        items = api.root.add_resource("items")
-        items.add_method("ANY")
+        items = api.root.add_resource('items')
+        items.add_method('ANY')
 
-        lambdaSearchLayer = _lambda.LayerVersion(self, 'InsertLayer',
+        lambdaInsertLayer = _lambda.LayerVersion(self, 'InsertLayer',
             code = _lambda.AssetCode('./lambda/tea_glossary_insert/layer'),
             compatible_runtimes = [_lambda.Runtime.PYTHON_3_8],
         ) 
 
         tea_glossary_insert = _lambda.Function(
-            self, "TeaGlossaryInsert",
+            self, 'TeaGlossaryInsert',
             runtime=_lambda.Runtime.PYTHON_3_8,
-            code=_lambda.Code.from_asset("./lambda/tea_glossary_insert/handler"),
-            handler="tea_glossary_insert.handler",
-            layers=[lambdaSearchLayer],
+            code=_lambda.Code.from_asset('./lambda/tea_glossary_insert/handler'),
+            handler='tea_glossary_insert.lambda_handler',
+            layers=[lambdaInsertLayer],
             environment={
-                "google_spreadsheet_api_key": "speradsheet_api_key",
-                "spreadsheet_id": "spreadsheet_id",
+                'google_spreadsheet_api_key': 'speradsheet_api_key',
+                'spreadsheet_id': 'spreadsheet_id',
             },
         )
         
         glossary_table = aws_dynamodb.Table(
-            self, "GlossaryTable",
+            self, 'GlossaryTable',
             partition_key=aws_dynamodb.Attribute(
-                name="word",
+                name='word',
                 type=aws_dynamodb.AttributeType.STRING
             )
         )
