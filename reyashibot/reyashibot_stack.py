@@ -55,6 +55,7 @@ class ReyashibotStack(Stack):
                 'google_spreadsheet_api_key': 'speradsheet_api_key',
                 'spreadsheet_id': 'spreadsheet_id',
             },
+            timeout=Duration.minutes(1),
         )
         
         glossary_table = aws_dynamodb.Table(
@@ -64,6 +65,8 @@ class ReyashibotStack(Stack):
                 type=aws_dynamodb.AttributeType.STRING
             )
         )
+
+        tea_glossary_insert.add_environment("TABLE_NAME", glossary_table.table_name)
 
         glossary_table.grant_read_write_data(tea_glossary_insert)
         glossary_table.grant_read_data(tea_glossary_search)

@@ -1,16 +1,15 @@
 import json
 import os
-from functools import reduce
 import boto3
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 SPREADSHEET_ID = os.environ['spreadsheet_id']
 API_KEY = os.environ['google_spreadsheet_api_key']
+TABLE_NAME = os.environ['TABLE_NAME']
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 SAMPLE_RANGE = 'A:B'
-client = boto3.client('dynamodb')
 
 def get_spreadsheet():
     try:
@@ -20,7 +19,7 @@ def get_spreadsheet():
         values = result.get('values', [])
 
         if not values:
-            print('No data found.')
+            raise Exception('No data found')
 
         return format_spreadsheet(values)
     except HttpError as err:
@@ -37,12 +36,18 @@ def format_spreadsheet(values):
 
     for row in values:
         if len(row) > 1:
-            glossary.append(split_entry(row))
+            glossary += split_entry(row)
 
     return glossary
 
 def insert_spreadsheet(spreadsheet):
-    print('bulk insert in dynamodb')
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(TABLE_NAME)
+    spreadsheet_filtered = filter(lambda e: e['word'], spreadsheet)
+    
+    with table.batch_writer() as batch:
+        for item in spreadsheet_filtered:
+            batch.put_item(item)
 
 def lambda_handler(event, context):
     spreadsheet = get_spreadsheet()
@@ -52,6 +57,3 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps(f'{API_KEY}:{SPREADSHEET_ID}')
     }
-
-if __name__ == "__main__":
-    print(lambda_handler(None, None))
