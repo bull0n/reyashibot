@@ -1,3 +1,4 @@
+import os
 from aws_cdk import (
     Stack,
     Duration,
@@ -26,7 +27,7 @@ class ReyashibotStack(Stack):
             handler='tea_glossary_search.lambda_handler',
             layers=[lambdaSearchLayer],
             environment={
-                'discord_public_key': 'discord_app_id',
+                'discord_public_key':  os.environ['DISCORD_PUBLIC_KEY'],
             },
         )
         
@@ -52,8 +53,8 @@ class ReyashibotStack(Stack):
             handler='tea_glossary_insert.lambda_handler',
             layers=[lambdaInsertLayer],
             environment={
-                'google_spreadsheet_api_key': 'speradsheet_api_key',
-                'spreadsheet_id': 'spreadsheet_id',
+                'google_spreadsheet_api_key': os.environ['GOOGLE_SPREADSHEET_API_KEY'],
+                'spreadsheet_id': os.environ['SPREADSHEET_ID'],
             },
             timeout=Duration.minutes(1),
         )
@@ -67,6 +68,7 @@ class ReyashibotStack(Stack):
         )
 
         tea_glossary_insert.add_environment("TABLE_NAME", glossary_table.table_name)
+        tea_glossary_search.add_environment("TABLE_NAME", glossary_table.table_name)
 
         glossary_table.grant_read_write_data(tea_glossary_insert)
         glossary_table.grant_read_data(tea_glossary_search)
@@ -74,7 +76,7 @@ class ReyashibotStack(Stack):
         rule_tea_glossary_insert = events.Rule(
             self, 'TeaGlossaryInsertRule',
             description='Insert glossary entries in database',
-            schedule=events.Schedule.rate(Duration.hours(1))
+            schedule=events.Schedule.rate(Duration.hours(12))
         )
         
         rule_tea_glossary_insert.add_target(targets.LambdaFunction(tea_glossary_insert))

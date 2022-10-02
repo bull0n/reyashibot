@@ -3,6 +3,7 @@ package-lock.json
 __pycache__
 .pytest_cache
 .venv
+.env
 docker
 *.egg-info
 
