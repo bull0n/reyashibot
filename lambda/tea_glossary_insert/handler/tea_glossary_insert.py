@@ -29,7 +29,7 @@ def split_entry(entry):
     keys = entry[0].split(", ")
     definition = entry[1]
 
-    return list(map(lambda k: {'word': k, 'definition': definition}, keys))
+    return list(map(lambda k: {'word': k.lower(), 'word_capitalized': k, 'definition': definition}, keys))
 
 def format_spreadsheet(values):
     glossary = []
@@ -45,7 +45,7 @@ def insert_spreadsheet(spreadsheet):
     table = dynamodb.Table(TABLE_NAME)
     spreadsheet_filtered = filter(lambda e: e['word'], spreadsheet)
     
-    with table.batch_writer() as batch:
+    with table.batch_writer(overwrite_by_pkeys=['word']) as batch:
         for item in spreadsheet_filtered:
             batch.put_item(item)
 

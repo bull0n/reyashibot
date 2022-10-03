@@ -13,42 +13,62 @@ dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
 
 def search_definition(word):
-    response = table.get_item(Key={'word': {'S': word}})
+    print(f'value searched: {word}')
+    response = table.get_item(Key={'word': word.lower()})
 
-    if not response:
+    if not response.get('Item', None):
         return '🤔 No definition found'
 
-    return response['definition']
+    definition = response['Item']['definition']
+    return f'**{word}**: {definition}'
 
 def ping_pong(body):
-    return body.get("type") == 1
+    return body['type'] == 1
 
 def verify_signature(body, timestamp, signature):   
     message = timestamp.encode() + body.encode()
     verify_key = VerifyKey(bytes.fromhex(PUBLIC_KEY))
     verify_key.verify(message, bytes.fromhex(signature))
+    
+def get_word(json_body):
+    return json_body['data']['options'][0]['value']
 
 def lambda_handler(event, context):
-    print(event) #debug 
-
     try:
         verify_signature(
             event['body'], 
-            event['params']['header'].get('x-signature-timestamp'), 
-            event['params']['header'].get('x-signature-ed25519')
+            event['headers'].get('x-signature-timestamp'), 
+            event['headers'].get('x-signature-ed25519')
         )
+        print('signature valid')
     except BadSignatureError as e:
+        print('problem with salt')
         return {
             'statusCode': 401,
-            'body': json.dumps("signature invalid"),
+            'body': json.dumps('signature invalid'),
+        }
+    
+    json_body = json.loads(event['body'])
+    
+    if ping_pong(json_body):
+        print('pong')
+        return {
+            'statusCode': 200,
+            'body': json.dumps(PING_PONG),
         }
 
-    if ping_pong(event['body']):
-        return PING_PONG
-
-    word = 'twl'
+    word = get_word(json_body)
     definition = search_definition(word)
+    
     return {
-        'statusCode': 200,
-        'body': json.dumps(definition)
-    }
+            'statusCode': 200,
+            'body': json.dumps({
+            "type": 4,
+            "data": {
+                "tts": False,
+                "content": definition,
+                "embeds": [],
+                "allowed_mentions": []
+            }
+        }),
+        }

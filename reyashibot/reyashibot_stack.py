@@ -38,7 +38,7 @@ class ReyashibotStack(Stack):
             proxy=False
         )
 
-        items = api.root.add_resource('items')
+        items = api.root.add_resource('definitions')
         items.add_method('ANY')
 
         lambdaInsertLayer = _lambda.LayerVersion(self, 'InsertLayer',
