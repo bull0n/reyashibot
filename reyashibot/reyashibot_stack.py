@@ -8,12 +8,30 @@ from aws_cdk import (
     aws_events as events,
     aws_events_targets as targets,
 )
+from aws_cdk.pipelines import CodePipeline, CodePipelineSource, ShellStep
 from constructs import Construct
+
+OWNER_REPO = os.environ['OWNER_REPO']
 
 class ReyashibotStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+
+        pipeline = CodePipeline(self, "Pipeline", 
+            pipeline_name="TeaGlossaryPipeline",
+                docker_enabled_for_synth=True,
+                synth=ShellStep("Synth", 
+                input=CodePipelineSource.git_hub(OWNER_REPO, 'main'),
+                commands=[
+                    'npm install -g aws-cdk', 
+                    'python -m pip install -r requirements.txt', 
+                    'docker run -v lambda/tea_glossary_insert/layer:/var/task "public.ecr.aws/sam/build-python3.8" /bin/sh -c "pip install -r requirements.txt -t python/lib/python3.8/site-packages/; exit"',
+                    'docker run -v lambda/tea_glossary_search/layer:/var/task "public.ecr.aws/sam/build-python3.8" /bin/sh -c "pip install -r requirements.txt -t python/lib/python3.8/site-packages/; exit"',
+                    'cdk synth',
+                ]
+            )
+        )
 
         lambdaSearchLayer = _lambda.LayerVersion(self, 'SearchLayer',
             code = _lambda.AssetCode('./lambda/tea_glossary_search/layer'),
@@ -76,7 +94,7 @@ class ReyashibotStack(Stack):
         rule_tea_glossary_insert = events.Rule(
             self, 'TeaGlossaryInsertRule',
             description='Insert glossary entries in database',
-            schedule=events.Schedule.rate(Duration.hours(12))
+            schedule=events.Schedule.rate(Duration.hours(1))
         )
         
         rule_tea_glossary_insert.add_target(targets.LambdaFunction(tea_glossary_insert))
