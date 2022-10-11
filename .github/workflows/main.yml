@@ -28,7 +28,6 @@ jobs:
         run: npm install -g aws-cdk
       - name: Install dependencies
         run: pip install -r requirements.txt
-      -  
       - name: Build lambda layers
         run: |
           'mkdir -p lambda/tea_glossary_insert/layer/python/lib/python3.8/site-packages',
