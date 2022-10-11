@@ -6,6 +6,7 @@ on:
 jobs:
   aws_cdk:
     runs-on: ubuntu-latest
+    environment: deploy-eu-central-1
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
