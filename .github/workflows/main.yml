@@ -10,9 +10,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
       - name: Set up node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: "16"
       - name: Set up Python 3.8
         uses: actions/setup-python@v4
         with:
@@ -30,8 +30,8 @@ jobs:
         run: pip install -r requirements.txt
       - name: Build lambda layers
         run: |
-          'docker run -v lambda/tea_glossary_insert/layer:/var/task "public.ecr.aws/sam/build-python3.8" /bin/sh -c "pip install -r requirements.txt -t python/lib/python3.8/site-packages/; exit"',
-          'docker run -v lambda/tea_glossary_search/layer:/var/task "public.ecr.aws/sam/build-python3.8" /bin/sh -c "pip install -r requirements.txt -t python/lib/python3.8/site-packages/; exit"',
+          'docker run -v "$PWD/lambda/tea_glossary_insert/layer":/var/task "public.ecr.aws/sam/build-python3.8" /bin/sh -c "pip install -r requirements.txt -t python/lib/python3.8/site-packages/; exit"',
+          'docker run -v "$PWD/lambda/tea_glossary_search/layer":/var/task "public.ecr.aws/sam/build-python3.8" /bin/sh -c "pip install -r requirements.txt -t python/lib/python3.8/site-packages/; exit"',
       - name: Synth stack
         run: cdk synth
       - name: Deploy stack
