@@ -28,10 +28,13 @@ jobs:
         run: npm install -g aws-cdk
       - name: Install dependencies
         run: pip install -r requirements.txt
+      -  
       - name: Build lambda layers
         run: |
-          'docker run -v "$PWD/lambda/tea_glossary_insert/layer":/var/task "public.ecr.aws/sam/build-python3.8" /bin/sh -c "pip install -r requirements.txt -t python/lib/python3.8/site-packages/; exit"',
-          'docker run -v "$PWD/lambda/tea_glossary_search/layer":/var/task "public.ecr.aws/sam/build-python3.8" /bin/sh -c "pip install -r requirements.txt -t python/lib/python3.8/site-packages/; exit"',
+          'mkdir -p lambda/tea_glossary_insert/layer/python/lib/python3.8/site-packages',
+          'pip install -r lambda/tea_glossary_insert/layer/requirements.txt --target lambda/tea_glossary_insert/layer/python/lib/python3.8/site-packages',
+          'mkdir -p lambda/tea_glossary_search/layer/python/lib/python3.8/site-packages'
+          'pip install -r lambda/tea_glossary_search/layer/requirements.txt --target lambda/tea_glossary_search/layer/python/lib/python3.8/site-packages',
       - name: Synth stack
         run: cdk synth
       - name: Deploy stack
