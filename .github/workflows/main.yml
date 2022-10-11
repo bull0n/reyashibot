@@ -35,6 +35,8 @@ jobs:
           pip install -r lambda/tea_glossary_insert/layer/requirements.txt --target lambda/tea_glossary_insert/layer/python/lib/python3.8/site-packages
           mkdir -p lambda/tea_glossary_search/layer/python/lib/python3.8/site-package
           pip install -r lambda/tea_glossary_search/layer/requirements.txt --target lambda/tea_glossary_search/layer/python/lib/python3.8/site-packages
+      - name: env
+        run: env
       - name: Synth stack
         run: cdk synth
       - name: Deploy stack
