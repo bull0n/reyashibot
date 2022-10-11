@@ -7,6 +7,13 @@ jobs:
   aws_cdk:
     runs-on: ubuntu-latest
     environment: deploy-eu-central-1
+    env:
+      DISCORD_PUBLIC_KEY: '${{ secrets.DISCORD_PUBLIC_KEY }}'
+      GOOGLE_SPREADSHEET_API_KEY: '${{ secrets.GOOGLE_SPREADSHEET_API_KEY }}'
+      SPREADSHEET_ID: '${{ secrets.SPREADSHEET_ID }}'
+      OWNER_REPO: '${{ secrets.OWNER_REPO }}'
+      ACCOUNT: '${{ secrets.ACCOUNT }}'
+      REGION: '${{ secrets.REGION }}'
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -35,8 +42,6 @@ jobs:
           pip install -r lambda/tea_glossary_insert/layer/requirements.txt --target lambda/tea_glossary_insert/layer/python/lib/python3.8/site-packages
           mkdir -p lambda/tea_glossary_search/layer/python/lib/python3.8/site-package
           pip install -r lambda/tea_glossary_search/layer/requirements.txt --target lambda/tea_glossary_search/layer/python/lib/python3.8/site-packages
-      - name: env
-        run: env
       - name: Synth stack
         run: cdk synth
       - name: Deploy stack
