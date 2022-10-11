@@ -45,4 +45,4 @@ jobs:
       - name: Synth stack
         run: cdk synth
       - name: Deploy stack
-        run: cdk deploy
+        run: cdk deploy --require-approval never
