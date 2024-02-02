@@ -65,10 +65,7 @@ def lambda_handler(event, context):
             'body': json.dumps({
             "type": 4,
             "data": {
-                "tts": False,
                 "content": definition,
-                "embeds": [],
-                "allowed_mentions": []
             }
         }),
         }
