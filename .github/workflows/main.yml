@@ -20,11 +20,11 @@ jobs:
       - name: Set up node
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
-      - name: Set up Python 3.8
+          node-version: 18
+      - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: '3.12'
           cache: 'pip'
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
