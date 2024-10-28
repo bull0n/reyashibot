@@ -17,12 +17,12 @@ class ReyashibotStack(Stack):
 
         lambdaSearchLayer = _lambda.LayerVersion(self, 'SearchLayer',
             code = _lambda.AssetCode('./lambda/tea_glossary_search/layer'),
-            compatible_runtimes = [_lambda.Runtime.PYTHON_3_8],
+            compatible_runtimes = [_lambda.Runtime.PYTHON_3_12],
         )   
 
         tea_glossary_search = _lambda.Function(
             self, 'TeaGlossarySearch',
-            runtime=_lambda.Runtime.PYTHON_3_8,
+            runtime=_lambda.Runtime.PYTHON_3_12,
             code=_lambda.Code.from_asset('./lambda/tea_glossary_search/handler'),
             handler='tea_glossary_search.lambda_handler',
             layers=[lambdaSearchLayer],
@@ -43,12 +43,12 @@ class ReyashibotStack(Stack):
 
         lambdaInsertLayer = _lambda.LayerVersion(self, 'InsertLayer',
             code = _lambda.AssetCode('./lambda/tea_glossary_insert/layer'),
-            compatible_runtimes = [_lambda.Runtime.PYTHON_3_8],
+            compatible_runtimes = [_lambda.Runtime.PYTHON_3_12],
         ) 
 
         tea_glossary_insert = _lambda.Function(
             self, 'TeaGlossaryInsert',
-            runtime=_lambda.Runtime.PYTHON_3_8,
+            runtime=_lambda.Runtime.PYTHON_3_12,
             code=_lambda.Code.from_asset('./lambda/tea_glossary_insert/handler'),
             handler='tea_glossary_insert.lambda_handler',
             layers=[lambdaInsertLayer],
