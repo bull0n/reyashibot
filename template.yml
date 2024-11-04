@@ -38,11 +38,11 @@ Resources:
   SpreadsheetId:
     Description: 'Google Spreadsheet Id'
     Type: String
-    Name: '/reyashibot/spreadhseet/SpreadhseetId' 
+    Name: '/reyashibot/spreadhseet/SpreadsheetId' 
     Tier: Standard
-  GoogleSpreadhseetApiKey:
+  GoogleSpreadsheetApiKey:
     Description: 'Spreadsheet API Key'
     Type: String
-    Name: '/reyashibot/spreadhseet/GoogleSpreadhseetApiKey' 
+    Name: '/reyashibot/spreadhseet/GoogleSpreadsheetApiKey' 
     Tier: Standard
   

@@ -21,7 +21,7 @@ class ReyashibotStack(Stack):
 
         discord_public_key_param = ssm.StringParameter(self, 'DiscordPublicKey', 
             parameter_name='/reyashibot/discord/DiscordPublicKey', 
-            string_value='', 
+            string_value=os.environ['DISCORD_PUBLIC_KEY'], 
             tier=ssm.ParameterTier.STANDARD
         )
 
@@ -57,15 +57,15 @@ class ReyashibotStack(Stack):
             compatible_runtimes = [_lambda.Runtime.PYTHON_3_12],
         )
 
-        spreadsheet_api_key_param = ssm.StringParameter(self, 'GoogleSpreadhseetApiKey', 
-            parameter_name='/reyashibot/spreadhseet/GoogleSpreadhseetApiKey', 
-            string_value='', 
+        spreadsheet_api_key_param = ssm.StringParameter(self, 'GoogleSpreadsheetApiKey', 
+            parameter_name='/reyashibot/spreadhseet/GoogleSpreasheetApiKey', 
+            string_value=os.environ['GOOGLE_SPREADSHEET_API_KEY'], 
             tier=ssm.ParameterTier.STANDARD
         )
 
-        spreadsheet_id_param = ssm.StringParameter(self, 'SpreadhseetId', 
-            parameter_name='/reyashibot/spreadhseet/SpreadhseetId', 
-            string_value='', 
+        spreadsheet_id_param = ssm.StringParameter(self, 'SpreadsheetId', 
+            parameter_name='/reyashibot/spreadhseet/SpreadsheetId', 
+            string_value=os.environ['SPREADSHEET_ID'], 
             tier=ssm.ParameterTier.STANDARD
         )
 
