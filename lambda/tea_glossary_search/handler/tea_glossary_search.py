@@ -4,8 +4,10 @@ import os
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
 
+ssm = boto3.client('ssm')
 
-PUBLIC_KEY = os.environ['discord_public_key']
+print('hello')
+PUBLIC_KEY = ssm.get_parameter(Name='/reyashibot/discord/DiscordPublicKey')
 TABLE_NAME = os.environ['TABLE_NAME']
 PING_PONG = {"type": 1}
 

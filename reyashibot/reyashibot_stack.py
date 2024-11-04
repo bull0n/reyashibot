@@ -7,6 +7,10 @@ from aws_cdk import (
     aws_apigateway as api_gw,
     aws_events as events,
     aws_events_targets as targets,
+    aws_codedeploy as deploy,
+    aws_cloudwatch as cloudwatch,
+    aws_cloudwatch_actions as cloudwatch_actions,
+    aws_ssm as ssm,
 )
 from constructs import Construct
 
@@ -15,21 +19,28 @@ class ReyashibotStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        lambdaSearchLayer = _lambda.LayerVersion(self, 'SearchLayer',
+        discord_public_key_param = ssm.StringParameter(self, 'DiscordPublicKey', 
+            parameter_name='/reyashibot/discord/DiscordPublicKey', 
+            string_value='', 
+            tier=ssm.ParameterTier.STANDARD
+        )
+
+        lambda_search_layer = _lambda.LayerVersion(self, 'SearchLayer',
             code = _lambda.AssetCode('./lambda/tea_glossary_search/layer'),
             compatible_runtimes = [_lambda.Runtime.PYTHON_3_12],
-        )   
+        )
 
         tea_glossary_search = _lambda.Function(
             self, 'TeaGlossarySearch',
             runtime=_lambda.Runtime.PYTHON_3_12,
             code=_lambda.Code.from_asset('./lambda/tea_glossary_search/handler'),
             handler='tea_glossary_search.lambda_handler',
-            layers=[lambdaSearchLayer],
-            environment={
-                'discord_public_key':  os.environ['DISCORD_PUBLIC_KEY'],
-            },
+            layers=[lambda_search_layer],
         )
+
+        discord_public_key_param.grant_read(tea_glossary_search)
+
+        tea_glossary_search_alias = _lambda.Alias(self, 'TeaGlossarySearchAlias', alias_name='live', version=tea_glossary_search.current_version)
         
         api = api_gw.LambdaRestApi(
             self, 
@@ -44,7 +55,19 @@ class ReyashibotStack(Stack):
         lambdaInsertLayer = _lambda.LayerVersion(self, 'InsertLayer',
             code = _lambda.AssetCode('./lambda/tea_glossary_insert/layer'),
             compatible_runtimes = [_lambda.Runtime.PYTHON_3_12],
-        ) 
+        )
+
+        spreadsheet_api_key_param = ssm.StringParameter(self, 'GoogleSpreadhseetApiKey', 
+            parameter_name='/reyashibot/spreadhseet/GoogleSpreadhseetApiKey', 
+            string_value='', 
+            tier=ssm.ParameterTier.STANDARD
+        )
+
+        spreadsheet_id_param = ssm.StringParameter(self, 'SpreadhseetId', 
+            parameter_name='/reyashibot/spreadhseet/SpreadhseetId', 
+            string_value='', 
+            tier=ssm.ParameterTier.STANDARD
+        )
 
         tea_glossary_insert = _lambda.Function(
             self, 'TeaGlossaryInsert',
@@ -52,12 +75,11 @@ class ReyashibotStack(Stack):
             code=_lambda.Code.from_asset('./lambda/tea_glossary_insert/handler'),
             handler='tea_glossary_insert.lambda_handler',
             layers=[lambdaInsertLayer],
-            environment={
-                'google_spreadsheet_api_key': os.environ['GOOGLE_SPREADSHEET_API_KEY'],
-                'spreadsheet_id': os.environ['SPREADSHEET_ID'],
-            },
             timeout=Duration.minutes(1),
         )
+
+        spreadsheet_api_key_param.grant_read(tea_glossary_insert)
+        spreadsheet_id_param.grant_read(tea_glossary_insert)
         
         glossary_table = aws_dynamodb.Table(
             self, 'GlossaryTable',
@@ -80,3 +102,32 @@ class ReyashibotStack(Stack):
         )
         
         rule_tea_glossary_insert.add_target(targets.LambdaFunction(tea_glossary_insert))
+
+        tea_glossary_search_alarm = cloudwatch.Alarm(
+            self, 
+            'LambdaTeaGlossarySearchFailure', 
+            alarm_description='Lambda search alarm for deployment',
+            metric=tea_glossary_search_alias.metric_errors(period=Duration.minutes(1)),
+            threshold=1,
+            evaluation_periods=1,
+        )
+
+        # tea_glossary_search_alarm.add_alarm_action(cloudwatch_actions.Actions.SnsAction(topic));
+
+        tea_glossary_search_deploy_post_hook = _lambda.Function(
+            self, 'TeaGlossarySearchDeployPostHook',
+            runtime=_lambda.Runtime.PYTHON_3_12,
+            code=_lambda.Code.from_asset('./tests/lambda/tea_glossary_search_validate'),
+            handler='tea_glossary_search_validate.lambda_handler',
+        )
+
+        tea_glossary_search.grant_invoke(tea_glossary_search_deploy_post_hook)
+    
+        deployment_group = deploy.LambdaDeploymentGroup(
+            self,
+            'TeaGlossarySearchDeploymentGroup',
+            alias=tea_glossary_search_alias,
+            deployment_config=deploy.LambdaDeploymentConfig.ALL_AT_ONCE,
+            alarms=[tea_glossary_search_alarm],
+            post_hook=tea_glossary_search_deploy_post_hook,
+        )

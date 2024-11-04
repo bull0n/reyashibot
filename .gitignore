@@ -9,6 +9,10 @@ docker
 
 **/layer/python/**
 
+.aws-sam/**
+
 # CDK asset staging directory
 .cdk.staging
 cdk.out
+
+*.DS_STORE

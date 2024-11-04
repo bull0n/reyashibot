@@ -7,7 +7,6 @@ from reyashibot.reyashibot_stack import ReyashibotStack
 
 
 app = cdk.App()
-ReyashibotStack(app, 'ReyashibotStack',env=cdk.Environment(account=os.environ['ACCOUNT'], region=os.environ['REGION'])
-    )
+ReyashibotStack(app, 'ReyashibotStack',env=cdk.Environment(account=os.environ['ACCOUNT'], region=os.environ['REGION']))
 
 app.synth()

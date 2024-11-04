@@ -1,0 +1,48 @@
+WSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+
+Description: A template for local execution of lambda
+
+Resources:
+  TeaGlossarySearch:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: tea_glossary_search.lambda_handler
+      Runtime: python3.12
+      CodeUri: lambda/tea_glossary_search/handler
+      Timeout: 15
+      Layers:
+        - !Ref SearchLayer
+      Environment:
+        variables:
+          TABLE_NAME: !Select [1, !Split ['/', !GetAtt GlossaryTable.Arn]] 
+  SearchLayer:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: lambda/tea_glossary_search/layer/
+      CompatibleRuntimes:
+        - python3.12
+    Metadata:
+      BuildMethod: python3.12
+  GlossaryTable:
+    Type: AWS::Serverless::SimpleTable
+    PrimaryKey:
+      Name: word
+      Type: String
+
+  DiscordPublicKey:
+    Description: 'Discord Public Key'
+    Type: String
+    Name: '/reyashibot/discord/DiscordPublicKey' 
+    Tier: Standard
+  SpreadsheetId:
+    Description: 'Google Spreadsheet Id'
+    Type: String
+    Name: '/reyashibot/spreadhseet/SpreadhseetId' 
+    Tier: Standard
+  GoogleSpreadhseetApiKey:
+    Description: 'Spreadsheet API Key'
+    Type: String
+    Name: '/reyashibot/spreadhseet/GoogleSpreadhseetApiKey' 
+    Tier: Standard
+  
