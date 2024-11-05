@@ -119,6 +119,9 @@ class ReyashibotStack(Stack):
             runtime=_lambda.Runtime.PYTHON_3_12,
             code=_lambda.Code.from_asset('./tests/lambda/tea_glossary_search_validate'),
             handler='tea_glossary_search_validate.lambda_handler',
+            environment={
+                "LAMBDA_NAME": tea_glossary_search.function_name,
+            }
         )
 
         tea_glossary_search.grant_invoke(tea_glossary_search_deploy_post_hook)
