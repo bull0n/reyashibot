@@ -11,6 +11,7 @@ from aws_cdk import (
     aws_cloudwatch as cloudwatch,
     aws_cloudwatch_actions as cloudwatch_actions,
     aws_ssm as ssm,
+    aws_iam as iam,
 )
 from constructs import Construct
 
@@ -119,12 +120,15 @@ class ReyashibotStack(Stack):
             runtime=_lambda.Runtime.PYTHON_3_12,
             code=_lambda.Code.from_asset('./tests/lambda/tea_glossary_search_validate'),
             handler='tea_glossary_search_validate.lambda_handler',
+            timeout=Duration.seconds(15),
             environment={
                 "LAMBDA_NAME": tea_glossary_search.function_name,
-            }
+            },
         )
 
         tea_glossary_search.grant_invoke(tea_glossary_search_deploy_post_hook)
+
+        deployment_group_role = iam.Role(self, "ReyashibotDeployGroup", assumed_by=iam.ServicePrincipal("codedeploy.amazonaws.com"))
     
         deployment_group = deploy.LambdaDeploymentGroup(
             self,
@@ -133,6 +137,7 @@ class ReyashibotStack(Stack):
             deployment_config=deploy.LambdaDeploymentConfig.ALL_AT_ONCE,
             alarms=[tea_glossary_search_alarm],
             post_hook=tea_glossary_search_deploy_post_hook,
+            role=deployment_group_role,
         )
 
-        tea_glossary_search_deploy_post_hook.grant_invoke(deployment_group)
+        tea_glossary_search_deploy_post_hook.grant_invoke(deployment_group.role)
