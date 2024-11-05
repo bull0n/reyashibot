@@ -129,5 +129,7 @@ class ReyashibotStack(Stack):
             alias=tea_glossary_search_alias,
             deployment_config=deploy.LambdaDeploymentConfig.ALL_AT_ONCE,
             alarms=[tea_glossary_search_alarm],
-            # post_hook=tea_glossary_search_deploy_post_hook,
+            post_hook=tea_glossary_search_deploy_post_hook,
         )
+
+        tea_glossary_search_deploy_post_hook.grant_invoke(deployment_group)
