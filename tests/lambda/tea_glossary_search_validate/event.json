@@ -1,0 +1,19 @@
+{
+    "resource": "/definitions",
+    "path": "/definitions",
+    "httpMethod": "POST",
+    "headers": {
+        "x-signature-ed25519": "a3402a1073a891bcc25db7f9015fd897ca0517a28febcc5beb1cf2df6cab54b74f98bf3e0207ec0153f607b54db70020ff1e9b853ea9614da8fed2b85ac18f0d",
+        "x-signature-timestamp": "1664739455"
+    },
+    "multiValueHeaders": {
+        "x-signature-ed25519": [
+            "a340207b54db70020ff1e9b853ea9614da8fed2b85ac18f0d"
+        ],
+        "x-signature-timestamp": [
+            "1664739455"
+        ]
+    },
+    "body": "{\"application_id\":\"1023664403754786896\",\"id\":\"1026216399623950387\",\"token\":\"aW50ZXJhY3Rpb246MTAyNjIxNjM5OTYyMzk1MDM4NzpOZ1k4cFRNRzhCSk91RkxHZlByOW01MEdXSnFTVzVhQ3ZRQ3podHdQZ1U4VWlMQXVteVZZNmJIcHB2anl3QldYbE1qTUhhbDJDM05jazR4SDMwMTViYXNuVWIwTkFSalZ1WlJ4SHRCc1NWVmljUHNObFBaWmVnb0dZNTlZcHIzdw\",\"type\":1,\"user\":{\"avatar\":\"5ce366b29c2438d57c9fd12a91382848\",\"avatar_decoration\":null,\"discriminator\":\"9704\",\"id\":\"308556192005750795\",\"public_flags\":0,\"username\":\"bullon\"},\"version\":1}",
+    "isBase64Encoded": false
+}
