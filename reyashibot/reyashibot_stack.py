@@ -128,7 +128,8 @@ class ReyashibotStack(Stack):
 
         tea_glossary_search.grant_invoke(tea_glossary_search_deploy_post_hook)
 
-        deployment_group_role = iam.Role(self, "ReyashibotDeployGroup", assumed_by=iam.ServicePrincipal("codedeploy.amazonaws.com"))
+        deployment_group_role = iam.Role(self, "ReyashibotDeploymentGroup", assumed_by=iam.ServicePrincipal("codedeploy.amazonaws.com"))
+        tea_glossary_search_deploy_post_hook.grant_invoke(deployment_group_role)
     
         deployment_group = deploy.LambdaDeploymentGroup(
             self,
@@ -139,5 +140,3 @@ class ReyashibotStack(Stack):
             post_hook=tea_glossary_search_deploy_post_hook,
             role=deployment_group_role,
         )
-
-        tea_glossary_search_deploy_post_hook.grant_invoke(deployment_group.role)
