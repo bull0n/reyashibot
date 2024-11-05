@@ -107,7 +107,7 @@ class ReyashibotStack(Stack):
             self, 
             'LambdaTeaGlossarySearchFailure', 
             alarm_description='Lambda search alarm for deployment',
-            metric=tea_glossary_search_alias.metric_errors(period=Duration.minutes(1)),
+            metric=tea_glossary_search_alias.metric_errors(period=Duration.minutes(2)),
             threshold=1,
             evaluation_periods=1,
         )

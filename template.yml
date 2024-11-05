@@ -14,8 +14,18 @@ Resources:
       Layers:
         - !Ref SearchLayer
       Environment:
-        variables:
+        Variables:
           TABLE_NAME: !Select [1, !Split ['/', !GetAtt GlossaryTable.Arn]] 
+  TeaGlossarySearchValidate:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: tea_glossary_search_validate.lambda_handler
+      Runtime: python3.12
+      CodeUri: tests/lambda/tea_glossary_search_validate
+      Timeout: 15
+      Environment:
+        Variables:
+          LAMBDA_NAME: !Ref TeaGlossarySearch
   SearchLayer:
     Type: 'AWS::Serverless::LayerVersion'
     Properties:
@@ -31,16 +41,19 @@ Resources:
       Type: String
 
   DiscordPublicKey:
+    Type: 'AWS::SSM::Parameter'
     Description: 'Discord Public Key'
     Type: String
     Name: '/reyashibot/discord/DiscordPublicKey' 
     Tier: Standard
   SpreadsheetId:
+    Type: 'AWS::SSM::Parameter'
     Description: 'Google Spreadsheet Id'
     Type: String
     Name: '/reyashibot/spreadhseet/SpreadsheetId' 
     Tier: Standard
   GoogleSpreadsheetApiKey:
+    Type: 'AWS::SSM::Parameter'
     Description: 'Spreadsheet API Key'
     Type: String
     Name: '/reyashibot/spreadhseet/GoogleSpreadsheetApiKey' 

@@ -6,8 +6,7 @@ from nacl.exceptions import BadSignatureError
 
 ssm = boto3.client('ssm')
 
-print('hello')
-PUBLIC_KEY = ssm.get_parameter(Name='/reyashibot/discord/DiscordPublicKey')
+PUBLIC_KEY = ssm.get_parameter(Name='/reyashibot/discord/DiscordPublicKey')['Parameter']['Value']
 TABLE_NAME = os.environ['TABLE_NAME']
 PING_PONG = {"type": 1}
 
@@ -27,7 +26,8 @@ def search_definition(word):
 def ping_pong(body):
     return body['type'] == 1
 
-def verify_signature(body, timestamp, signature):   
+def verify_signature(body, timestamp, signature):
+    print(PUBLIC_KEY)
     message = timestamp.encode() + body.encode()
     verify_key = VerifyKey(bytes.fromhex(PUBLIC_KEY))
     verify_key.verify(message, bytes.fromhex(signature))
@@ -61,7 +61,7 @@ def lambda_handler(event, context):
 
     word = get_word(json_body)
     definition = search_definition(word)
-    
+
     return {
             'statusCode': 200,
             'body': json.dumps({

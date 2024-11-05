@@ -5,8 +5,8 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 ssm = boto3.client('ssm')
-SPREADSHEET_ID = ssm.get_parameter(Name='/reyashibot/spreadhseet/SpreadhseetId')
-API_KEY = ssm.get_parameter(Name='reyashibot/spreadhseet/GoogleSpreadhseetApiKey')
+SPREADSHEET_ID = ssm.get_parameter(Name='/reyashibot/spreadhseet/SpreadhseetId')['Parameter']['Value']
+API_KEY = ssm.get_parameter(Name='reyashibot/spreadhseet/GoogleSpreadhseetApiKey')['Parameter']['Value']
 TABLE_NAME = os.environ['TABLE_NAME']
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
