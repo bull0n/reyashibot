@@ -14,6 +14,7 @@ jobs:
       OWNER_REPO: '${{ secrets.OWNER_REPO }}'
       ACCOUNT: '${{ secrets.ACCOUNT }}'
       REGION: '${{ secrets.REGION }}'
+      EMAIL_NOTIFICATION: '${{ env.EMAIL_NOTIFICATION }}'
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
