@@ -1,7 +1,7 @@
 import boto3
 import os
 
-ENDPOINT = 'http://localhost:3001/' if bool(os.environ['AWS_SAM_LOCAL']) else None
+ENDPOINT = 'http://localhost:3001/' if 'AWS_SAM_LOCAL' in os.environ.keys() and bool(os.environ['AWS_SAM_LOCAL']) else None
 lambda_client = boto3.client('lambda', endpoint_url=ENDPOINT)
 codedeploy_client = boto3.client('codedeploy')
 LAMBDA_NAME = os.environ
