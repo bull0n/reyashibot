@@ -11,7 +11,8 @@ with open('event.json') as f: PAYLOAD = f.read()
 def lambda_handler(event, context):
     try:
         lambda_client.invoke(FunctionName=LAMBDA_NAME, InvocationType='RequestResponse', Payload=PAYLOAD)
-    except:
+    except Exception as e:
+        print(e)
         codedeploy_client.put_lifecycle_event_hook_execution_status(
             deploymentId=event['DeploymentId'],
             lifecycleEventHookExecutionId=event['LifecycleEventHookExecutionId'],
