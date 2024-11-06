@@ -12,8 +12,12 @@ from aws_cdk import (
     aws_cloudwatch_actions as cloudwatch_actions,
     aws_ssm as ssm,
     aws_iam as iam,
+    aws_sns as sns,
+    aws_sns_subscriptions as subscriptions,
 )
 from constructs import Construct
+
+PYTHON_VERSION = _lambda.Runtime.PYTHON_3_12
 
 class ReyashibotStack(Stack):
 
@@ -28,12 +32,12 @@ class ReyashibotStack(Stack):
 
         lambda_search_layer = _lambda.LayerVersion(self, "SearchLayer",
             code = _lambda.AssetCode("./lambda/tea_glossary_search/layer"),
-            compatible_runtimes = [_lambda.Runtime.PYTHON_3_12],
+            compatible_runtimes = [PYTHON_VERSION],
         )
 
         tea_glossary_search = _lambda.Function(
             self, "TeaGlossarySearch",
-            runtime=_lambda.Runtime.PYTHON_3_12,
+            runtime=PYTHON_VERSION,
             code=_lambda.Code.from_asset("./lambda/tea_glossary_search/handler"),
             handler="tea_glossary_search.lambda_handler",
             layers=[lambda_search_layer],
@@ -55,7 +59,7 @@ class ReyashibotStack(Stack):
 
         lambdaInsertLayer = _lambda.LayerVersion(self, "InsertLayer",
             code = _lambda.AssetCode("./lambda/tea_glossary_insert/layer"),
-            compatible_runtimes = [_lambda.Runtime.PYTHON_3_12],
+            compatible_runtimes = [PYTHON_VERSION],
         )
 
         spreadsheet_api_key_param = ssm.StringParameter(self, "GoogleSpreadsheetApiKey", 
@@ -72,7 +76,7 @@ class ReyashibotStack(Stack):
 
         tea_glossary_insert = _lambda.Function(
             self, "TeaGlossaryInsert",
-            runtime=_lambda.Runtime.PYTHON_3_12,
+            runtime=PYTHON_VERSION,
             code=_lambda.Code.from_asset("./lambda/tea_glossary_insert/handler"),
             handler="tea_glossary_insert.lambda_handler",
             layers=[lambdaInsertLayer],
@@ -113,11 +117,13 @@ class ReyashibotStack(Stack):
             evaluation_periods=1,
         )
 
-        # tea_glossary_search_alarm.add_alarm_action(cloudwatch_actions.Actions.SnsAction(topic));
+        deployment_failure_topic = sns.Topic(self, "ReyashibotDeploymentFailureTopic")
+        tea_glossary_search_alarm.add_alarm_action(cloudwatch_actions.SnsAction(deployment_failure_topic));
+        deployment_failure_topic.add_subscription(subscriptions.EmailSubscription(os.environ["EMAIL_NOTIFICATION"]))
 
         tea_glossary_search_deploy_post_hook = _lambda.Function(
             self, "TeaGlossarySearchDeployPostHook",
-            runtime=_lambda.Runtime.PYTHON_3_12,
+            runtime=PYTHON_VERSION,
             code=_lambda.Code.from_asset("./tests/lambda/tea_glossary_search_validate"),
             handler="tea_glossary_search_validate.lambda_handler",
             timeout=Duration.seconds(15),
