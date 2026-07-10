@@ -17,18 +17,18 @@ jobs:
       EMAIL_NOTIFICATION: '${{ vars.EMAIL_NOTIFICATION }}'
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
       - name: Set up node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version: 18
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v4
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version: '3.14'
           cache: 'pip'
       - name: Configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
@@ -39,10 +39,10 @@ jobs:
         run: pip install -r requirements.txt
       - name: Build lambda layers
         run: |
-          mkdir -p lambda/tea_glossary_insert/layer/python/lib/python3.12/site-packages
-          pip install -r lambda/tea_glossary_insert/layer/requirements.txt --target lambda/tea_glossary_insert/layer/python/lib/python3.12/site-packages
-          mkdir -p lambda/tea_glossary_search/layer/python/lib/python3.12/site-package
-          pip install -r lambda/tea_glossary_search/layer/requirements.txt --target lambda/tea_glossary_search/layer/python/lib/python3.12/site-packages
+          mkdir -p lambda/tea_glossary_insert/layer/python/lib/python3.14/site-packages
+          pip install -r lambda/tea_glossary_insert/layer/requirements.txt --target lambda/tea_glossary_insert/layer/python/lib/python3.14/site-packages
+          mkdir -p lambda/tea_glossary_search/layer/python/lib/python3.14/site-package
+          pip install -r lambda/tea_glossary_search/layer/requirements.txt --target lambda/tea_glossary_search/layer/python/lib/python3.14/site-packages
       - name: Synth stack
         run: cdk synth
       - name: Deploy stack

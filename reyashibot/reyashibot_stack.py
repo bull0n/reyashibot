@@ -17,7 +17,7 @@ from aws_cdk import (
 )
 from constructs import Construct
 
-PYTHON_VERSION = _lambda.Runtime.PYTHON_3_12
+PYTHON_VERSION = _lambda.Runtime.PYTHON_3_14
 
 class ReyashibotStack(Stack):
 
